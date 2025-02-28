@@ -1,95 +1,45 @@
-#include <SDL.h>
-#include <SDL_image.h>
-#include <SDL_mixer.h>
+﻿#include <SDL.h>
+#include <SDL_ttf.h>
 #include <iostream>
 
 const int SCREEN_WIDTH = 800;
 const int SCREEN_HEIGHT = 600;
 
-bool init(SDL_Window*& window, SDL_Renderer*& renderer) {
-    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0) {
+int main(int argc, char* argv[]) {
+    if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         std::cerr << "SDL could not initialize! SDL_Error: " << SDL_GetError() << std::endl;
-        return false;
+        return -1;
     }
 
-    window = SDL_CreateWindow("SDL Image & MP3 Test", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
-    if (!window) {
-        std::cerr << "Window could not be created! SDL_Error: " << SDL_GetError() << std::endl;
-        return false;
+    if (TTF_Init() == -1) {
+        std::cerr << "TTF_Init() failed! TTF_Error: " << TTF_GetError() << std::endl;
+        return -1;
     }
 
-    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+    SDL_Window* window = SDL_CreateWindow("SDL_ttf Test", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+    SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+
     if (!renderer) {
         std::cerr << "Renderer could not be created! SDL_Error: " << SDL_GetError() << std::endl;
-        return false;
+        return -1;
     }
 
-    if (!(IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG)) {
-        std::cerr << "SDL_image could not initialize! IMG_Error: " << IMG_GetError() << std::endl;
-        return false;
+    // Load font từ thư mục assets/fonts
+    TTF_Font* font = TTF_OpenFont("arial.ttf", 28);
+    if (!font) {
+        std::cerr << "Failed to load font! TTF_Error: " << TTF_GetError() << std::endl;
+        return -1;
     }
 
-    if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
-        std::cerr << "SDL_mixer could not initialize! Mix_Error: " << Mix_GetError() << std::endl;
-        return false;
-    }
+    SDL_Color textColor = { 255, 255, 255, 255 }; // Màu trắng
+    SDL_Surface* textSurface = TTF_RenderText_Solid(font, "Hello, SDL_ttf!", textColor);
+    SDL_Texture* textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
+    SDL_FreeSurface(textSurface);
 
-    return true;
-}
-
-SDL_Texture* loadTexture(const std::string& path, SDL_Renderer* renderer) {
-    SDL_Texture* newTexture = nullptr;
-    SDL_Surface* loadedSurface = IMG_Load(path.c_str());
-
-    if (!loadedSurface) {
-        std::cerr << "Failed to load image! IMG_Error: " << IMG_GetError() << std::endl;
-    }
-    else {
-        newTexture = SDL_CreateTextureFromSurface(renderer, loadedSurface);
-        SDL_FreeSurface(loadedSurface);
-    }
-
-    return newTexture;
-}
-
-void close(SDL_Window*& window, SDL_Renderer*& renderer, SDL_Texture*& texture, Mix_Music*& music) {
-    SDL_DestroyTexture(texture);
-    Mix_FreeMusic(music);
-    Mix_CloseAudio();
-    SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(window);
-    IMG_Quit();
-    SDL_Quit();
-}
-
-int main(int argc, char* argv[]) {
-    SDL_Window* window = nullptr;
-    SDL_Renderer* renderer = nullptr;
-
-    if (!init(window, renderer)) {
-        return 1;
-    }
-
-    SDL_Texture* imageTexture = loadTexture("map.png", renderer);
-    if (!imageTexture) {
-        Mix_Music* dummyMusic = nullptr; // Declare a dummy Mix_Music* variable
-        close(window, renderer, imageTexture, dummyMusic);
-        return 1;
-    }
-
-    Mix_Music* bgm = Mix_LoadMUS("background.mp3");
-    if (!bgm) {
-        std::cerr << "Failed to load music! Mix_Error: " << Mix_GetError() << std::endl;
-        close(window, renderer, imageTexture, bgm);
-        return 1;
-    }
-
-    Mix_PlayMusic(bgm, -1);
-    std::cout << "Playing music... Press Enter to quit." << std::endl;
+    SDL_Rect textRect = { 100, 100, 300, 50 };
 
     bool quit = false;
     SDL_Event e;
-
     while (!quit) {
         while (SDL_PollEvent(&e) != 0) {
             if (e.type == SDL_QUIT) {
@@ -97,12 +47,20 @@ int main(int argc, char* argv[]) {
             }
         }
 
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
-        SDL_RenderCopy(renderer, imageTexture, NULL, NULL);
+
+        SDL_RenderCopy(renderer, textTexture, NULL, &textRect);
+
         SDL_RenderPresent(renderer);
     }
 
-    close(window, renderer, imageTexture, bgm);
+    SDL_DestroyTexture(textTexture);
+    TTF_CloseFont(font);
+    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(window);
+    TTF_Quit();
+    SDL_Quit();
+
     return 0;
 }
-
