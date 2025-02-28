@@ -27,6 +27,6 @@ int main(int argc, char* argv[]) {
     Mix_CloseAudio();
     SDL_Quit();
 
-    return 0;
+    
 }
 
