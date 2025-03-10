@@ -1,7 +1,8 @@
-#ifndef GAME_H
+﻿#ifndef GAME_H
 #define GAME_H
 
 #include <SDL.h>
+#include "Ball.h"
 #include "Paddle.h"
 
 class Game {
@@ -11,6 +12,9 @@ public:
 
     bool init();
     void run();
+    void processInput();
+    void update();
+    void render();
     void close();
 
 private:
@@ -18,11 +22,8 @@ private:
     SDL_Renderer* renderer;
     bool isRunning;
 
+    Ball* ball;  
     Paddle paddle;
-
-    void processInput();
-    void update();
-    void render();
 };
 
 #endif

@@ -6,7 +6,7 @@
 class Paddle {
 public:
     Paddle();
-
+    SDL_Rect&  getRect() { return paddleRect; }
     void handleEvent(SDL_Event& e);
     void update();
     void render(SDL_Renderer* renderer);
@@ -14,7 +14,8 @@ public:
 private:
     SDL_Rect paddleRect;
     int speed;
+    bool movingLeft, movingRight;
 };
 
 #endif
-#pragma once
+

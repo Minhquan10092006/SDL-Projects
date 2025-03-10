@@ -1,8 +1,10 @@
 ﻿#include "Paddle.h"
 
 Paddle::Paddle() {
-    paddleRect = { 350, 550, 100, 20 }; // Vị trí & kích thước paddle
-    speed = 10;
+    paddleRect = { 350, 550, 100, 20 }; 
+    speed = 5;
+    movingLeft = false;
+    movingRight = false;
 }
 
 // Xử lý phím di chuyển paddle
@@ -10,19 +12,37 @@ void Paddle::handleEvent(SDL_Event& e) {
     if (e.type == SDL_KEYDOWN) {
         switch (e.key.keysym.sym) {
         case SDLK_LEFT:
-            paddleRect.x -= speed;
+            movingLeft = true;
             break;
         case SDLK_RIGHT:
-            paddleRect.x += speed;
+            movingRight = true;
+            break;
+        }
+    }
+    else if (e.type == SDL_KEYUP) { 
+        switch (e.key.keysym.sym) {
+        case SDLK_LEFT:
+            movingLeft = false;
+            break;
+        case SDLK_RIGHT:
+            movingRight = false;
             break;
         }
     }
 }
 
-// Giới hạn paddle trong màn hình
+
 void Paddle::update() {
+    if (movingLeft) {
+        paddleRect.x -= speed;
+    }
+    if (movingRight) {
+        paddleRect.x += speed;
+    }
+
+    
     if (paddleRect.x < 0) paddleRect.x = 0;
-    if (paddleRect.x > 700) paddleRect.x = 700;
+    if (paddleRect.x + paddleRect.w > 800) paddleRect.x = 800 - paddleRect.w;
 }
 
 // Vẽ paddle

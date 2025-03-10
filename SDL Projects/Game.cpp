@@ -1,15 +1,16 @@
 ﻿#include "Game.h"
+#include "Ball.h"
 #include <iostream>
 
-// Khởi tạo game
-Game::Game() : window(nullptr), renderer(nullptr), isRunning(true) {}
 
-// Giải phóng tài nguyên
+
+Game::Game() : window(nullptr), renderer(nullptr), isRunning(true), ball(nullptr) {}
+
+
 Game::~Game() {
     close();
 }
 
-// Hàm khởi tạo SDL
 bool Game::init() {
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         std::cerr << "SDL không thể khởi tạo! Lỗi: " << SDL_GetError() << std::endl;
@@ -28,48 +29,63 @@ bool Game::init() {
         return false;
     }
 
+    
+    ball = new Ball(400, 300, 20, 5.0f, -5.0f, renderer);
     return true;
 }
 
-// Vòng lặp game chính
 void Game::run() {
+    const int FPS = 60;
+    const int frameDelay = 1000 / FPS;
+
+    Uint32 frameStart;
+    int frameTime;
+
     while (isRunning) {
-        processInput();
-        update();
-        render();
-        SDL_Delay(16); // Giới hạn FPS khoảng 60
-    }
-}
-
-// Xử lý sự kiện bàn phím
-void Game::processInput() {
-    SDL_Event event;
-    while (SDL_PollEvent(&event)) {
-        if (event.type == SDL_QUIT) {
-            isRunning = false;
+        frameStart = SDL_GetTicks();
+        // Xử lý sự kiện
+        SDL_Event event;
+        while (SDL_PollEvent(&event)) {
+            if (event.type == SDL_QUIT) {
+                isRunning = false;
+            }
+            paddle.handleEvent(event);
         }
-        paddle.handleEvent(event);
+
+        // Cập nhật trạng thái game
+        ball->update();
+        paddle.update();
+
+        if (SDL_HasIntersection(&ball->getRect(), &paddle.getRect()) && ball->getSpeedY() > 0) {
+            ball->bounce(paddle.getRect());
+        }
+
+
+        
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_RenderClear(renderer);
+
+        ball->render(renderer); 
+        paddle.render(renderer);
+
+        SDL_RenderPresent(renderer);
+        frameTime = SDL_GetTicks() - frameStart;
+
+        if (frameDelay > frameTime) {
+            SDL_Delay(frameDelay - frameTime);
+        }
     }
 }
 
-// Cập nhật game
-void Game::update() {
-    paddle.update();
-}
 
-// Vẽ màn hình
-void Game::render() {
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-    SDL_RenderClear(renderer);
 
-    paddle.render(renderer);
-
-    SDL_RenderPresent(renderer);
-}
-
-// Dọn dẹp tài nguyên
 void Game::close() {
+    if (ball) {
+        delete ball;
+        ball = nullptr;
+    }
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     SDL_Quit();
 }
+
