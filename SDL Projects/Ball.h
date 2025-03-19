@@ -3,13 +3,15 @@
 
 #include <SDL.h>
 #include <SDL_image.h>
+#include <vector>
+#include "Brick.h"
 
 class Ball {
 public:
     Ball(int x, int y, int size, float speedX, float speedY, SDL_Renderer* renderer);
     ~Ball();
 
-    void update();
+    void update(std::vector<Brick>& bricks);
     void render(SDL_Renderer* renderer);
     void reset();
 
@@ -19,14 +21,16 @@ public:
     void setSpeedX(float sx) { speedX = sx; }
     void setSpeedY(float sy) { speedY = sy; }
     void bounce(const SDL_Rect& paddleRect);
+    void checkBrickCollision(std::vector<Brick>& bricks);
 
 
 private:
     Uint32 lastUpdateTime;
     SDL_Rect ballRect;
-    float speedX=3.0;
+    float speedX = 3.0;
     float speedY = -3.0;
-    SDL_Texture* ballTexture; 
+    std::vector<Brick> bricks;
+    SDL_Texture* ballTexture;
 };
 
 #endif

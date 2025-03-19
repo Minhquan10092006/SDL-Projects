@@ -1,7 +1,7 @@
 ﻿#include "Paddle.h"
 
-Paddle::Paddle() {
-    paddleRect = { 350, 550, 100, 20 }; 
+Paddle::Paddle() { // Tạo kích thước padfle
+    paddleRect = { 350, 550, 100, 20 };
     speed = 5;
     movingLeft = false;
     movingRight = false;
@@ -19,7 +19,7 @@ void Paddle::handleEvent(SDL_Event& e) {
             break;
         }
     }
-    else if (e.type == SDL_KEYUP) { 
+    else if (e.type == SDL_KEYUP) {
         switch (e.key.keysym.sym) {
         case SDLK_LEFT:
             movingLeft = false;
@@ -40,7 +40,7 @@ void Paddle::update() {
         paddleRect.x += speed;
     }
 
-    
+
     if (paddleRect.x < 0) paddleRect.x = 0;
     if (paddleRect.x + paddleRect.w > 800) paddleRect.x = 800 - paddleRect.w;
 }
