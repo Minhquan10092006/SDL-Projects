@@ -7,10 +7,16 @@ Brick::Brick(int x, int y, int width, int height) {
 
 Brick::~Brick() {}
 
-void Brick::render(SDL_Renderer* renderer) {
+void Brick::render(SDL_Renderer* renderer,SDL_Texture* texture) {
     if (!isDestroyed) {
-        SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255); // Màu đỏ
-        SDL_RenderFillRect(renderer, &brickRect);
+
+        if (texture) {
+            SDL_RenderCopy(renderer, texture, nullptr, &brickRect);
+        }
+        else {
+            SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255); // Màu xanh (giữ lại màu gốc của bạn)
+            SDL_RenderFillRect(renderer, &brickRect);
+        }
     }
 }
 

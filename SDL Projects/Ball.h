@@ -21,7 +21,8 @@ public:
     void setSpeedX(float sx) { speedX = sx; }
     void setSpeedY(float sy) { speedY = sy; }
     void bounce(const SDL_Rect& paddleRect);
-    void checkBrickCollision(std::vector<Brick>& bricks);
+    bool checkBrickCollision(const Brick& brick);
+    bool ballLost = false;
 
 
 private:
@@ -29,7 +30,8 @@ private:
     SDL_Rect ballRect;
     float speedX = 3.0;
     float speedY = -3.0;
-    std::vector<Brick> bricks;
+    int lives = 3;
+    
     SDL_Texture* ballTexture;
 };
 

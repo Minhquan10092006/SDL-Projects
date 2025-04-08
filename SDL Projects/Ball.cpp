@@ -43,43 +43,62 @@ void Ball::update(std::vector<Brick>& bricks) {
         speedY = -speedY; 
     }
     if (ballRect.y > 600) {
+        ballLost = true;
+        lives--;
         reset();
     }
     // Xử lý bóng va chạm với gạch
-    for (auto& brick : bricks) { // kiem tra tung vien gach
+    for (auto& brick : bricks) {
         if (!brick.isDestroyed && SDL_HasIntersection(&ballRect, &brick.brickRect)) {
-
-            // Đánh dấu gạch bị phá
             brick.isDestroyed = true;
 
-            // Xác định mép nào va chạm trước và mép trái phải trên dưới bị bóng đè vào bao nhiêu pĩel
             int leftOverlap = (ballRect.x + ballRect.w) - brick.brickRect.x;
             int rightOverlap = (brick.brickRect.x + brick.brickRect.w) - ballRect.x;
             int topOverlap = (ballRect.y + ballRect.h) - brick.brickRect.y;
             int bottomOverlap = (brick.brickRect.y + brick.brickRect.h) - ballRect.y;
 
-            // Tìm phần giao nhỏ nhất để quyết định hướng nảy
             int minOverlap = std::min({ leftOverlap, rightOverlap, topOverlap, bottomOverlap });
 
-            if (minOverlap == leftOverlap) {
+            // Kiểm tra hướng di chuyển để tránh lỗi đi qua góc
+            if (minOverlap == topOverlap && speedY > 0) {
+                speedY = -fabs(speedY);  // Nảy lên
+            }
+            else if (minOverlap == bottomOverlap && speedY < 0) {
+                speedY = fabs(speedY);  // Nảy xuống
+            }
+            else if (minOverlap == leftOverlap && speedX > 0) {
                 speedX = -fabs(speedX);  // Nảy qua trái
             }
-            else if (minOverlap == rightOverlap) {
+            else if (minOverlap == rightOverlap && speedX < 0) {
                 speedX = fabs(speedX);  // Nảy qua phải
             }
-            else if (minOverlap == topOverlap) {
-                speedY = -fabs(speedY);  // Nảy lên trên
-            }
-            else if (minOverlap == bottomOverlap) {
-                speedY = fabs(speedY);  // Nảy xuống dưới
-            }
 
-            break;  // Phá xong 1 viên là dừng kiểm tra
+            break;
         }
     }
-
-    
 }
+
+bool Ball::checkBrickCollision(const Brick& brick) {
+    int ballCenterX = ballRect.x + ballRect.w / 2;
+    int ballCenterY = ballRect.y + ballRect.h / 2;
+
+    int brickCenterX = brick.brickRect.x + brick.brickRect.w / 2;
+    int brickCenterY = brick.brickRect.y + brick.brickRect.h / 2;
+
+    // Tính khoảng cách giữa tâm bóng và tâm viên gạch
+    int dx = abs(ballCenterX - brickCenterX);
+    int dy = abs(ballCenterY - brickCenterY);
+
+    // Bán kính bóng (giả sử bóng có kích thước vuông)
+    int ballRadius = ballRect.w / 2;
+
+    // Kiểm tra nếu khoảng cách nhỏ hơn tổng bán kính
+    if (dx < (brick.brickRect.w / 2 + ballRadius) && dy < (brick.brickRect.h / 2 + ballRadius)) {
+        return true;
+    }
+    return false;
+}
+
 
 void Ball::render(SDL_Renderer* renderer) {
     if (ballTexture) {
@@ -94,17 +113,24 @@ void Ball::bounce(const SDL_Rect& paddleRect) {
 
     int paddleCenter = paddleRect.x + paddleRect.w / 2;
     int ballCenter = ballRect.x + ballRect.w / 2;
-    // Tính độ lệch của bóng so với tâm paddle  từ -1 đến 1
+
+    // Tính độ lệch của bóng so với tâm paddle
     float impact = (float)(ballCenter - paddleCenter) / (paddleRect.w / 2.0f);
 
-    // điều chỉnh hướng X dựa trên điểm va chạm
-    speedX = impact * 5.0f;  // Tạt bóng theo hướng lệch  
+    // Điều chỉnh hướng X dựa trên điểm va chạm
+    speedX = impact * 5.0f;
 
-    // Đảm bảo tốc độ ko quá nhỏ
+    // Giới hạn góc nảy, tránh đi quá dọc
     if (fabs(speedX) < 1.0f) {
-        speedX = (speedX < 0) ? -1.0f : 1.0f;
+        speedX = (speedX < 0) ? -1.5f : 1.5f;  // Boost nhẹ sang ngang
+    }
+
+    // Hạn chế góc quá dốc
+    if (fabs(speedX) > fabs(speedY) * 2.5f) {
+        speedX = (speedX < 0) ? -fabs(speedY) * 2.5f : fabs(speedY) * 2.5f;
     }
 }
+
 
 
 void Ball::reset() {

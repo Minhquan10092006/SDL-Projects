@@ -1,10 +1,25 @@
 ﻿#include "Paddle.h"
 
-Paddle::Paddle() { // Tạo kích thước padfle
+Paddle::Paddle(SDL_Renderer* renderer) { // Tạo kích thước padfle
     paddleRect = { 350, 550, 100, 20 };
     speed = 5;
     movingLeft = false;
     movingRight = false;
+    paddleTexture = nullptr;
+    SDL_Surface* loadedSurface = IMG_Load("paddle.png");
+    if (!loadedSurface) {
+        std::cerr << "Không tải được ảnh paddle! Lỗi: " << IMG_GetError() << std::endl;
+    }
+    else {
+        paddleTexture = SDL_CreateTextureFromSurface(renderer, loadedSurface);
+        SDL_FreeSurface(loadedSurface);
+    }
+}
+Paddle::~Paddle() {
+    if (paddleTexture != nullptr) {
+        SDL_DestroyTexture(paddleTexture);
+        paddleTexture = nullptr;
+    }
 }
 
 // Xử lý phím di chuyển paddle
@@ -47,6 +62,11 @@ void Paddle::update() {
 
 // Vẽ paddle
 void Paddle::render(SDL_Renderer* renderer) {
-    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-    SDL_RenderFillRect(renderer, &paddleRect);
+    if (paddleTexture) {
+        SDL_RenderCopy(renderer, paddleTexture, nullptr, &paddleRect);
+    }
+    else {
+        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+        SDL_RenderFillRect(renderer, &paddleRect);
+    }
 }
