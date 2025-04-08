@@ -78,6 +78,7 @@ void Game::timeUp() {
         }
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
+        SDL_RenderCopy(renderer, gameBackground, nullptr, nullptr);
         SDL_RenderCopy(renderer, texture, nullptr, &textRect);
         SDL_RenderCopy(renderer, scoreTexture, nullptr, &scoreRect);  //Render điểm số
         SDL_RenderPresent(renderer);
@@ -145,6 +146,7 @@ void Game::gameOver() {
         }
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
+        SDL_RenderCopy(renderer, gameBackground, nullptr, nullptr);
         SDL_RenderCopy(renderer, texture, nullptr, &textRect);
         SDL_RenderCopy(renderer, scoreTexture, nullptr, &scoreRect);  //Render điểm số
         SDL_RenderPresent(renderer);
