@@ -6,10 +6,12 @@
 #include <SDL_image.h>
 #include <vector>
 #include <string>
+#include <SDL_mixer.h>
 #include "Ball.h"
 #include "Paddle.h"
 #include "Brick.h"
 #include "Menu.h"
+#include "Slider.h"
 
 enum Gamemode {SURVIVAL, TIME_ATTACK};
 
@@ -57,6 +59,12 @@ private:
     SDL_Texture* loadTexture(const std::string& path);
     SDL_Texture* brickTexture = nullptr;
     
+    Mix_Music* backgroundMusic = nullptr; // nhac nen
+    Mix_Chunk* brickHitSound = nullptr;   // am thanh khi dap vao brick
+    Mix_Chunk* paddleHitSound = nullptr; // am thanh khi dap vao paddle
+    Mix_Chunk* gameOverSound = nullptr;
+    Slider* volumeSlider;
+    int volume;
 };
 
 #endif

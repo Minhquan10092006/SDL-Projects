@@ -2,8 +2,7 @@
 #include <iostream>
 
 
-
-Game::  Game() : window(nullptr), renderer(nullptr), isRunning(true), ball(nullptr), paddle(nullptr), lives(3){}
+Game::  Game() : window(nullptr), renderer(nullptr), isRunning(true), ball(nullptr), paddle(nullptr), lives(3), volume(64){}
 
 Game::~Game() {
     close();
@@ -18,7 +17,17 @@ void Game::createBricks() {
         for (int col = 0; col < cols; col++) {
             int x = 60 + col * (brickWidth + 5);// +5 để làm cách viên gạch cách đều nhau ko bị dính thành hàng
             int y = 35 + row * (brickHeight + 5);// +5 để làm gahcj k bị dính thành cột
-            bricks.emplace_back(x, y, brickWidth, brickHeight);
+            int strength;
+            if (row < 2) {
+                strength = 3; // Red bricks
+            }
+            else if (row < 4) {
+                strength = 2; // Yellow bricks
+            }
+            else {
+                strength = 1; // Orange bricks
+            }
+            bricks.emplace_back(x, y, brickWidth, brickHeight, strength);
         }
     }
 }
@@ -104,6 +113,7 @@ void Game::renderTime() {
 }
 
 void Game::gameOver() {
+    Mix_PlayChannel(-1, gameOverSound, 0);
     SDL_Color textColor = { 255, 0, 0 };
     SDL_Surface* surface = TTF_RenderText_Solid(font, "Game Over! Press R to Restart or Q to Quit", textColor);
     SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
@@ -235,15 +245,44 @@ bool Game::init() {
         std::cerr << "Không thể load ảnh nền Pause!" << std::endl;
     }
 
-    brickTexture = loadTexture("brick.png");
-    if (!brickTexture) {
-        std::cerr << "Không thể load ảnh gạch!" << std::endl;
-    }
-
     menu = new Menu(renderer);
     if (!menu->loadBackground("menu_background.png")) {
         std::cerr << "Không thể load ảnh nền menu!" << std::endl;
     }
+
+    if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
+        printf("SDL_mixer could not initialize! SDL_mixer Error: %s\n", Mix_GetError());
+        return false;
+    }
+
+    backgroundMusic = Mix_LoadMUS("background_music.mp3");
+    if (!backgroundMusic) {
+        std::cerr << "Failed to load background music! SDL_mixer Error: " << Mix_GetError() << std::endl;
+        return false;
+    }
+    Mix_PlayMusic(backgroundMusic, -1); 
+
+    // Tải âm thanh hiệu ứng
+    brickHitSound = Mix_LoadWAV("brick_hit.wav");
+    if (!brickHitSound) {
+        std::cerr << "Failed to load brick hit sound! SDL_mixer Error: " << Mix_GetError() << std::endl;
+        return false;
+    }
+
+    paddleHitSound = Mix_LoadWAV("paddle_hit.wav");
+    if (!paddleHitSound) {
+        std::cerr << "Failed to load paddle hit sound! SDL_mixer Error: " << Mix_GetError() << std::endl;
+        return false;
+    } 
+
+    gameOverSound = Mix_LoadWAV("game_over.wav");
+    if (!gameOverSound) {
+        std::cerr << "Failed to load game over sound! SDL_mixer Error: " << Mix_GetError() << std::endl;
+        return false;
+    }
+
+    volumeSlider = new Slider(300, 300, 200, 0, 128, volume, renderer); // Thanh trượt nằm giữa màn hình
+
     bool inMenu= true;
     while (inMenu) {
         SDL_Event event;
@@ -296,27 +335,47 @@ void Game::run() {
                     isPaused = !isPaused;  // Đảo trạng thái Pause
                 }
             }
+            if (isPaused) {
+                volumeSlider->handleEvent(event);  // Kéo thanh trượt
+            }
             if (!isPaused) {
                 paddle->handleEvent(event);
             }
         }
         if (isPaused) {
-            SDL_Color textColor = { 255, 255, 255 };
-            SDL_Surface* surface = TTF_RenderText_Solid(font, "Paused - Press ESC to Resume", textColor);
-            SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
-            SDL_Rect textRect = { 250, 250, 300, 50 };
+    SDL_Color textColor = { 255, 255, 255 };
 
-            // Vẽ background Pause
-            SDL_RenderCopy(renderer, pauseBackground, nullptr, nullptr);
+    // Vẽ background Pause
+    SDL_RenderCopy(renderer, pauseBackground, nullptr, nullptr);
 
-            // Vẽ chữ "Paused"
-            SDL_RenderCopy(renderer, texture, nullptr, &textRect);
-            SDL_RenderPresent(renderer);
+    // Cập nhật âm lượng dựa trên giá trị của thanh trượt
+    int volume = volumeSlider->getValue();
+    volumeSlider->render(renderer);
 
-            SDL_FreeSurface(surface);
-            SDL_DestroyTexture(texture);
-            continue;  // Nhảy qua vòng lặp tiếp theo, không cập nhật game
-        }
+    Mix_Volume(-1, volume);       // Cập nhật âm lượng cho hiệu ứng âm thanh
+    Mix_VolumeMusic(volume);      // Cập nhật âm lượng cho nhạc nền
+
+    // Vẽ chữ "Paused - Press ESC to Resume"
+    SDL_Surface* pauseSurface = TTF_RenderText_Solid(font, "Paused - Press ESC to Resume", textColor);
+    SDL_Texture* pauseTexture = SDL_CreateTextureFromSurface(renderer, pauseSurface);
+    SDL_Rect pauseRect = { 250, 250, 300, 50 };
+    SDL_RenderCopy(renderer, pauseTexture, nullptr, &pauseRect);
+    SDL_FreeSurface(pauseSurface);
+    SDL_DestroyTexture(pauseTexture);
+
+    // 🔊 Vẽ chữ "Volume: x"
+    std::string volumeText = "Volume: " + std::to_string(volume);
+    SDL_Surface* volumeSurface = TTF_RenderText_Solid(font, volumeText.c_str(), textColor);
+    SDL_Texture* volumeTexture = SDL_CreateTextureFromSurface(renderer, volumeSurface);
+    SDL_Rect volumeRect = { 300, 270 + 60, 200, 30 };  // Gần bên dưới thanh trượt (giả định y = 330)
+    SDL_RenderCopy(renderer, volumeTexture, nullptr, &volumeRect);
+    SDL_FreeSurface(volumeSurface);
+    SDL_DestroyTexture(volumeTexture);
+
+    SDL_RenderPresent(renderer);
+    continue;  // Không update game khi pause
+}
+
         
         //Thêm Time Attack
         if (gamemode == TIME_ATTACK) {
@@ -338,12 +397,20 @@ void Game::run() {
 
         if (SDL_HasIntersection(&ball->getRect(), &paddle->getRect()) && ball->getSpeedY() > 0) {
             ball->bounce(paddle->getRect());
+            Mix_PlayChannel(-1, paddleHitSound, 0);
         }
 
         for (auto it = bricks.begin(); it != bricks.end();) {
             if (ball->checkBrickCollision(*it)) {
-                increaseScore(10);
-                it = bricks.erase(it);
+                it->hit();
+                Mix_PlayChannel(-1, brickHitSound, 0);
+                if (it->isDestroyed) {
+                    increaseScore(10);
+                    it = bricks.erase(it);
+                }
+                else {
+                    ++it;
+                }
                 break;
             }
             else {
@@ -366,6 +433,8 @@ void Game::run() {
         }
 
         if (bricks.empty()) {
+            ball->speedX *= 1.1f;
+            ball->speedY *= 1.1f;
             createBricks();
             ball->reset();
         }
@@ -376,7 +445,7 @@ void Game::run() {
         ball->render(renderer);
         paddle->render(renderer);
         for (auto& brick : bricks) {
-            brick.render(renderer,brickTexture);
+            brick.render(renderer);
         }
 
         renderScore();  // Hiển thị điểm số 
@@ -417,6 +486,29 @@ void Game::close() {
         brickTexture = nullptr;
     }
 
+    if (backgroundMusic) {
+        Mix_FreeMusic(backgroundMusic);
+        backgroundMusic = nullptr;
+    }
+
+    if (brickHitSound) {
+        Mix_FreeChunk(brickHitSound);
+        brickHitSound = nullptr;
+    }
+    if (paddleHitSound) {
+        Mix_FreeChunk(paddleHitSound);
+        paddleHitSound = nullptr;
+    }
+    if (gameOverSound) {
+        Mix_FreeChunk(gameOverSound);
+        gameOverSound = nullptr;
+    }
+    if (volumeSlider) {
+        delete volumeSlider;
+        volumeSlider = nullptr;
+    }
+
+    Mix_CloseAudio();
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     TTF_Quit();

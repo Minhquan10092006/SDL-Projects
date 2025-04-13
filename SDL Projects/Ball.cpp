@@ -50,8 +50,6 @@ void Ball::update(std::vector<Brick>& bricks) {
     // Xử lý bóng va chạm với gạch
     for (auto& brick : bricks) {
         if (!brick.isDestroyed && SDL_HasIntersection(&ballRect, &brick.brickRect)) {
-            brick.isDestroyed = true;
-
             int leftOverlap = (ballRect.x + ballRect.w) - brick.brickRect.x;
             int rightOverlap = (brick.brickRect.x + brick.brickRect.w) - ballRect.x;
             int topOverlap = (ballRect.y + ballRect.h) - brick.brickRect.y;

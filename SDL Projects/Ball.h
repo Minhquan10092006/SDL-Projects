@@ -23,13 +23,14 @@ public:
     void bounce(const SDL_Rect& paddleRect);
     bool checkBrickCollision(const Brick& brick);
     bool ballLost = false;
+    float speedX = 3.0;
+    float speedY = -3.0;
 
 
 private:
     Uint32 lastUpdateTime;
     SDL_Rect ballRect;
-    float speedX = 3.0;
-    float speedY = -3.0;
+    
     int lives = 3;
     
     SDL_Texture* ballTexture;

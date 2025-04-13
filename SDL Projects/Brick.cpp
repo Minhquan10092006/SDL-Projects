@@ -1,29 +1,34 @@
 ﻿#include "Brick.h"
 
-Brick::Brick(int x, int y, int width, int height) {
+Brick::Brick(int x, int y, int width, int height, int strength) {
     brickRect = { x, y, width, height };
+    this->strength = strength;
     isDestroyed = false;
 }
 
 Brick::~Brick() {}
 
-void Brick::render(SDL_Renderer* renderer,SDL_Texture* texture) {
-    if (!isDestroyed) {
-
-        if (texture) {
-            SDL_RenderCopy(renderer, texture, nullptr, &brickRect);
-        }
-        else {
-            SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255); // Màu xanh (giữ lại màu gốc của bạn)
-            SDL_RenderFillRect(renderer, &brickRect);
+void Brick::render(SDL_Renderer* renderer) {
+    if (strength == 1) {
+        SDL_SetRenderDrawColor(renderer, 255, 165, 0, 255); // Orange
+    }
+    else if (strength == 2) {
+        SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255); // Yellow
+    }
+    else if (strength == 3) {
+        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255); // Red
+    }
+    SDL_RenderFillRect(renderer, &brickRect);
+}
+void Brick::hit() {
+    if (strength > 0) {
+        strength--;
+        if (strength <= 0) {
+            isDestroyed = true;
         }
     }
 }
 
 bool Brick::checkCollision(SDL_Rect ballRect) {
-    if (SDL_HasIntersection(&brickRect, &ballRect)) {
-        isDestroyed = true;
-        return true;
-    }
-    return false;
-}
+    return SDL_HasIntersection(&brickRect, &ballRect);
+} 
