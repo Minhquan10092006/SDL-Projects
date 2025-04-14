@@ -10,10 +10,10 @@ Brick::~Brick() {}
 
 void Brick::render(SDL_Renderer* renderer) {
     if (strength == 1) {
-        SDL_SetRenderDrawColor(renderer, 255, 165, 0, 255); // Orange
+         SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255); // Yellow
     }
     else if (strength == 2) {
-        SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255); // Yellow
+       SDL_SetRenderDrawColor(renderer, 255, 165, 0, 255); // Orange
     }
     else if (strength == 3) {
         SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255); // Red

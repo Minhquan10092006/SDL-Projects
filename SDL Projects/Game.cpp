@@ -22,10 +22,10 @@ void Game::createBricks() {
                 strength = 3; // Red bricks
             }
             else if (row < 4) {
-                strength = 2; // Yellow bricks
+                strength = 2; // Orange bricks
             }
             else {
-                strength = 1; // Orange bricks
+                strength = 1; // Yellow bricks
             }
             bricks.emplace_back(x, y, brickWidth, brickHeight, strength);
         }
