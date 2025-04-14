@@ -39,7 +39,7 @@ void Game::resetGame() {
     // Reset điểm số, số mạng và thời gian
     score = 0;
     lives = 3;
-    timeLeft = 60; // Chỉ áp dụng nếu ở chế độ Time Attack
+    timeLeft = 120; // Chỉ áp dụng nếu ở chế độ Time Attack
     startTime = SDL_GetTicks(); // Lưu thời gian bắt đầu
 
     // Tạo lại các viên gạch
@@ -87,6 +87,72 @@ void Game::saveHighScores() {
     }
 }
 
+void Game::gameWin() {
+    if (score > highScoreTimeAttack) {
+        highScoreTimeAttack = score; // Cập nhật điểm cao nhất
+        saveHighScores();            // Lưu điểm cao mới
+    }
+
+    SDL_Color textColor = { 0, 255, 0 };  // Màu xanh lá (chiến thắng)
+    SDL_Surface* surface = TTF_RenderText_Solid(font, "You Win! Press R to Restart, Q to Quit, or M to Menu", textColor);
+    SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
+
+    // Hiển thị điểm số
+    std::string scoreText = "Final Score: " + std::to_string(score);
+    SDL_Surface* scoreSurface = TTF_RenderText_Solid(font, scoreText.c_str(), textColor);
+    SDL_Texture* scoreTexture = SDL_CreateTextureFromSurface(renderer, scoreSurface);
+
+    std::string highScoreText = "High Score (Time Attack): " + std::to_string(highScoreTimeAttack);
+    SDL_Surface* highScoreSurface = TTF_RenderText_Solid(font, highScoreText.c_str(), textColor);
+    SDL_Texture* highScoreTexture = SDL_CreateTextureFromSurface(renderer, highScoreSurface);
+
+    SDL_Rect textRect = { 150, 250, 500, 50 };  // Text "You Win"
+    SDL_Rect scoreRect = { 250, 320, 300, 50 }; // Final Score
+    SDL_Rect highScoreRect = { 250, 390, 300, 50 }; // High Score
+
+    SDL_FreeSurface(surface);
+    SDL_FreeSurface(scoreSurface);
+    SDL_FreeSurface(highScoreSurface);
+
+    bool waiting = true;
+    while (waiting) {
+        SDL_Event event;
+        while (SDL_PollEvent(&event)) {
+            if (event.type == SDL_QUIT) {
+                isRunning = false;
+                waiting = false;
+            }
+            if (event.type == SDL_KEYDOWN) {
+                if (event.key.keysym.sym == SDLK_r) {
+                    resetGame(); // Reset trạng thái game
+                    waiting = false;
+                }
+                if (event.key.keysym.sym == SDLK_q) {
+                    isRunning = false;
+                    waiting = false;
+                }
+                if (event.key.keysym.sym == SDLK_m) {
+                    returnToMenu = true;  // Quay lại menu
+                    resetGame();
+                    waiting = false;
+                }
+            }
+        }
+
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_RenderClear(renderer);
+        SDL_RenderCopy(renderer, gameBackground, nullptr, nullptr);
+        SDL_RenderCopy(renderer, texture, nullptr, &textRect);
+        SDL_RenderCopy(renderer, scoreTexture, nullptr, &scoreRect);
+        SDL_RenderCopy(renderer, highScoreTexture, nullptr, &highScoreRect);
+        SDL_RenderPresent(renderer);
+    }
+
+    SDL_DestroyTexture(texture);
+    SDL_DestroyTexture(scoreTexture);
+    SDL_DestroyTexture(highScoreTexture);
+}
+
 bool Game::runMenu() {
     bool inMenu = true;
 
@@ -106,7 +172,7 @@ bool Game::runMenu() {
                 else if (option == 1) {
                     resetGame();
                     gamemode = TIME_ATTACK;
-                    timeLeft = 60;
+                    timeLeft = 120;
                     startTime = SDL_GetTicks();
                 }
                 else if (option == 2) {
@@ -424,8 +490,14 @@ void Game::run() {
             if (event.type == SDL_KEYDOWN) {
                 if (event.key.keysym.sym == SDLK_ESCAPE) {
                     isPaused = !isPaused;  // Đảo trạng thái Pause
+                    if (isPaused) {
+                        pausedTime = SDL_GetTicks(); // Lưu thời gian khi bị paused
+                    }
+                    else {
+                        // Cập nhật startTime để bù thời gian bị paused
+                        startTime += SDL_GetTicks() - pausedTime;
+                    }
                 }
-
             }
             if (isPaused) {
                 if (event.type == SDL_KEYDOWN) {
@@ -475,9 +547,9 @@ void Game::run() {
 }
 
     //Thêm Time Attack
-    if (gamemode == TIME_ATTACK) {
+    if (gamemode == TIME_ATTACK && !isPaused) {
         Uint32 currentTime = SDL_GetTicks();
-        timeLeft = 60 - (currentTime - startTime) / 1000;
+        timeLeft = 120 - (currentTime - startTime) / 1000;
         if (timeLeft <= 0) {
             timeUp();
             return;  // Kết thúc game ngay khi hết thời gian
@@ -485,6 +557,10 @@ void Game::run() {
         if (lives <= 0) {
             gameOver();
             return;
+        }
+        if (isWin) {
+            gameWin(); // Hiển thị màn hình chiến thắng
+            return;    // Thoát vòng lặp game
         }
     }
 
@@ -530,10 +606,17 @@ void Game::run() {
         }
 
         if (bricks.empty()) {
-            ball->speedX *= 1.1f;
-            ball->speedY *= 1.1f;
-            createBricks();
-            ball->reset();
+            if (gamemode == TIME_ATTACK) {
+                isWin = true; // Đặt trạng thái thắng
+                break;        // Thoát vòng lặp game để hiển thị màn hình chiến thắng
+            }
+            else {
+                // Nếu không phải Time Attack, tiếp tục tạo lại gạch
+                ball->speedX *= 1.1f;
+                ball->speedY *= 1.1f;
+                createBricks();
+                ball->reset();
+            };
         }
 
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);

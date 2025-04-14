@@ -55,11 +55,14 @@ private:
 
     Menu* menu;
     Uint32 startTime;
+    Uint32 pausedTime;
 
     void renderTime();
     void timeUp();
     void loadHighScores();
     void saveHighScores();
+    bool isWin = false;
+    void gameWin();
 
     bool isPaused = false;
     SDL_Texture* pauseBackground = nullptr;
