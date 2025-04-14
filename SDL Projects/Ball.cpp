@@ -7,10 +7,10 @@ Ball::Ball(int x, int y, int size, float speedX, float speedY, SDL_Renderer* ren
     ballRect = { x, y, size , size};
     this->speedX = speedX;
     this->speedY = speedY;
-    std::srand(std::time(nullptr)); // Khởi tạo seed ngẫu nhiên
+    std::srand(std::time(nullptr)); // Khởi tạo seed ngẫu nhiên để reset bóng ngẫu nhiên
 
     // Load hình ảnh bóng
-    SDL_Surface* surface = IMG_Load("ball.png");
+    SDL_Surface* surface = IMG_Load("assets/image/ball.png");
     if (!surface) {
         std::cerr << "Không thể load hình ảnh bóng! Lỗi: " << IMG_GetError() << std::endl;
         ballTexture = nullptr;
@@ -28,11 +28,12 @@ Ball::~Ball() {
 }
 
 void Ball::update(std::vector<Brick>& bricks) {
-    Uint32 currentTime = SDL_GetTicks();
+    Uint32 currentTime = SDL_GetTicks(); // thời gian hiện tại(ms)
     float deltaTime = (currentTime - lastUpdateTime) / 1000.0f; // Cả đoạn này đưa deltaTime vào speedX và speedY 
-                                                                // làm cho fgame ko bị nhanh chậm bất thường
-    lastUpdateTime = currentTime;
-    ballRect.x += static_cast<int>(speedX);
+    lastUpdateTime = currentTime;                               // làm cho game ko bị nhanh chậm bất thường
+    
+    //cập nhật vị trí bóng 
+    ballRect.x += static_cast<int>(speedX);  // tạm thời chưa nhân delta time vì tốc độ thấp        
     ballRect.y += static_cast<int>(speedY);
 
     // Xử lý va chạm với tường
@@ -50,11 +51,13 @@ void Ball::update(std::vector<Brick>& bricks) {
     // Xử lý bóng va chạm với gạch
     for (auto& brick : bricks) {
         if (!brick.isDestroyed && SDL_HasIntersection(&ballRect, &brick.brickRect)) {
+            //tìm phần giao với gạch theo 4 phía
             int leftOverlap = (ballRect.x + ballRect.w) - brick.brickRect.x;
             int rightOverlap = (brick.brickRect.x + brick.brickRect.w) - ballRect.x;
             int topOverlap = (ballRect.y + ballRect.h) - brick.brickRect.y;
             int bottomOverlap = (brick.brickRect.y + brick.brickRect.h) - ballRect.y;
 
+            //ktra hướng va chạm nhỏ nhất 
             int minOverlap = std::min({ leftOverlap, rightOverlap, topOverlap, bottomOverlap });
 
             // Kiểm tra hướng di chuyển để tránh lỗi đi qua góc
@@ -76,6 +79,7 @@ void Ball::update(std::vector<Brick>& bricks) {
     }
 }
 
+// Kiểm tra va chạm giữa bóng và gạch dựa trên khoảng cách tâm vì bóng hình tròn
 bool Ball::checkBrickCollision(const Brick& brick) {
     int ballCenterX = ballRect.x + ballRect.w / 2;
     int ballCenterY = ballRect.y + ballRect.h / 2;
@@ -104,7 +108,7 @@ void Ball::render(SDL_Renderer* renderer) {
     }
 }
 
-
+//bóng nảy khi va chạm với paddle
 void Ball::bounce(const SDL_Rect& paddleRect) {
     // Đảo hướng Y để bóng nảy lên trên
     speedY = -speedY;
@@ -123,7 +127,7 @@ void Ball::bounce(const SDL_Rect& paddleRect) {
         speedX = (speedX < 0) ? -1.5f : 1.5f;  // Boost nhẹ sang ngang
     }
 
-    // Hạn chế góc quá dốc
+    // Hạn chế góc quá ngang
     if (fabs(speedX) > fabs(speedY) * 2.5f) {
         speedX = (speedX < 0) ? -fabs(speedY) * 2.5f : fabs(speedY) * 2.5f;
     }

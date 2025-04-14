@@ -2,7 +2,7 @@
 
 Brick::Brick(int x, int y, int width, int height, int strength) {
     brickRect = { x, y, width, height };
-    this->strength = strength;
+    this->strength = strength; // luu cap cua gach
     isDestroyed = false;
 }
 
@@ -22,7 +22,7 @@ void Brick::render(SDL_Renderer* renderer) {
 }
 void Brick::hit() {
     if (strength > 0) {
-        strength--;
+        strength--; // khi gahc bi đap thi suc manh giam di 1 va tu doi mau 
         if (strength <= 0) {
             isDestroyed = true;
         }
@@ -30,5 +30,5 @@ void Brick::hit() {
 }
 
 bool Brick::checkCollision(SDL_Rect ballRect) {
-    return SDL_HasIntersection(&brickRect, &ballRect);
+    return SDL_HasIntersection(&brickRect, &ballRect); // kiem tra va cham giua gach va bong
 } 

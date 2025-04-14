@@ -10,7 +10,6 @@ int main(int argc, char* argv[]) {
         return -1;
     }
 
-    // Vòng lặp chính
     while (game.isRunningGame()) { // Kiểm tra trạng thái chạy của game
         if (game.runMenu()) { // Hiển thị menu và kiểm tra lựa chọn
             game.run(); // Bắt đầu trò chơi

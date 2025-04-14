@@ -1,4 +1,4 @@
-#ifndef MENU_H
+﻿#ifndef MENU_H
 #define MENU_H
 
 #include <SDL.h>
@@ -10,21 +10,21 @@
 struct Button {
 	SDL_Rect rect;
 	std::string text;
-	SDL_Color normalColor;
-	SDL_Color hoverColor;
-	bool isHovered;
+	SDL_Color normalColor; 
+	SDL_Color hoverColor; // màu khi trỏ chuột lên
+	bool isHovered; // biến kiểm tra xem chuột có đang chỉ vào rect ko
 
 };
 
 class Menu {
 public:
 	Menu(SDL_Renderer* renderer);
-	~Menu();
+	~Menu(); // destructor giải phóng tài nguyên
 
 	bool handleEvent(SDL_Event& e);
 	void render();
 	
-	int getSelectedOption();
+	int getSelectedOption(); // lấy lựa chọn hiện tại
 	bool loadBackground(const std::string& filePath);
 
 private:

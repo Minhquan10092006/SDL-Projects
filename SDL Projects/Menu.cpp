@@ -2,13 +2,13 @@
 #include <iostream>
 
 Menu::Menu(SDL_Renderer* renderer) : renderer(renderer), background(nullptr), selectedOption(-1) {
-	font = TTF_OpenFont("FeulismiaDemo-MAmEB.ttf", 24);
+	font = TTF_OpenFont("assets/font/FeulismiaDemo-MAmEB.ttf", 24);
 	if (!font) {
 		std::cerr << "Không thể tải font: " << TTF_GetError() << std::endl;
 	}
 
 	buttons = {
-		{{300, 200, 200, 50}, "Survival Mode", {255,255,255}, {255,0,0}},
+		{{300, 200, 200, 50}, "Survival Mode", {255,255,255}, {255,0,0}}, // su dung initializer list de tao cac nut 
 		{{300, 270, 200 ,50}, "Time Attack", {255,255,255}, {255,0,0}},
 		{{300, 340, 200 ,50}, "Quit", {255,255,255}, {255,0,0}},
 	};
@@ -42,24 +42,24 @@ bool Menu::handleEvent(SDL_Event& e) {
 		int mouseY = e.motion.y;
 
 		for (size_t i = 0; i < buttons.size(); i++) {
-			if (mouseX >= buttons[i].rect.x && mouseX <= buttons[i].rect.x + buttons[i].rect.w &&
-				mouseY >= buttons[i].rect.y && mouseY <= buttons[i].rect.y + buttons[i].rect.h) {
-				buttons[i].isHovered = true;
+			if (mouseX >= buttons[i].rect.x && mouseX <= buttons[i].rect.x + buttons[i].rect.w && // kiem tra chuot xem co van cham voi nut hay ko
+				mouseY >= buttons[i].rect.y && mouseY <= buttons[i].rect.y + buttons[i].rect.h) { 
+				buttons[i].isHovered = true; // nếu nằm ở trên thì đổi màu
 				if (e.type == SDL_MOUSEBUTTONDOWN) {
-					selectedOption = i;
+					selectedOption = i; //nếu nhấn chuột thì lựa chọn bằng i
 					if (buttons[i].text == "Quit") {
 						SDL_Quit();
 						exit(0);
 					}
-					return true;
+					return true; // chọn bất kì nút nào thì trả về true
 				}
 			}
 			else{
-				buttons[i].isHovered = false;
+				buttons[i].isHovered = false; //neu ko nam tren nut nua thi doi mau lai binh thuong
 			}
 		}
 	}
-	return false;
+	return false; // ko co gi xay ra thi tra ve false
 }
 
 void Menu::render() {
@@ -71,12 +71,12 @@ void Menu::render() {
 		SDL_RenderClear(renderer);
 	}
 
-	// Hiển thị tiêu đề "Brick Breaker" với hiệu ứng 3D
+	// Hiển thị tiêu đề Brick Breaker với hiệu ứng 3D
 	SDL_Color shadowColor = { 50, 50, 50 };  // Màu đổ bóng (xám đậm)
 	SDL_Color titleColor = { 255, 255, 0 };  // Màu chính (vàng)
 
 	// Tạo font lớn hơn cho tiêu đề
-	TTF_Font* titleFont = TTF_OpenFont("FeulismiaDemo-MAmEB.ttf", 48); // Tăng size chữ
+	TTF_Font* titleFont = TTF_OpenFont("assets/font/FeulismiaDemo-MAmEB.ttf", 48); // Tăng size chữ
 
 	if (titleFont) {
 		// Render đổ bóng
@@ -126,5 +126,5 @@ void Menu::render() {
 }
 
 int Menu::getSelectedOption() {
-	return selectedOption;
+	return selectedOption; // trả về số nút đc chọn
 }

@@ -404,24 +404,24 @@ bool Game::init() {
         return false;
     }
 
-    font = TTF_OpenFont("MelonCamp-4nMxY.ttf", 24);
+    font = TTF_OpenFont("assets/font/MelonCamp-4nMxY.ttf", 24);
     if (!font) {
         std::cout << "Failed to load font: " << TTF_GetError() << std::endl;
         return false;
     }
 
-    gameBackground = loadTexture("game_background.png");
+    gameBackground = loadTexture("assets/image/game_background.png");
     if (!gameBackground) {
         std::cerr << "Không thể load ảnh nền game chính!" << std::endl;
     }
     
-    pauseBackground = loadTexture("pause_background.png");
+    pauseBackground = loadTexture("assets/image/pause_background.png");
     if (!pauseBackground) {
         std::cerr << "Không thể load ảnh nền Pause!" << std::endl;
     }
 
     menu = new Menu(renderer);
-    if (!menu->loadBackground("menu_background.png")) {
+    if (!menu->loadBackground("assets/image/menu_background.png")) {
         std::cerr << "Không thể load ảnh nền menu!" << std::endl;
     }
 
@@ -430,7 +430,7 @@ bool Game::init() {
         return false;
     }
 
-    backgroundMusic = Mix_LoadMUS("background_music.mp3");
+    backgroundMusic = Mix_LoadMUS("assets/sound/background_music.mp3");
     if (!backgroundMusic) {
         std::cerr << "Failed to load background music! SDL_mixer Error: " << Mix_GetError() << std::endl;
         return false;
@@ -438,19 +438,19 @@ bool Game::init() {
     Mix_PlayMusic(backgroundMusic, -1); 
 
     // Tải âm thanh hiệu ứng
-    brickHitSound = Mix_LoadWAV("brick_hit.wav");
+    brickHitSound = Mix_LoadWAV("assets/sound/brick_hit.wav");
     if (!brickHitSound) {
         std::cerr << "Failed to load brick hit sound! SDL_mixer Error: " << Mix_GetError() << std::endl;
         return false;
     }
 
-    paddleHitSound = Mix_LoadWAV("paddle_hit.wav");
+    paddleHitSound = Mix_LoadWAV("assets/sound/paddle_hit.wav");
     if (!paddleHitSound) {
         std::cerr << "Failed to load paddle hit sound! SDL_mixer Error: " << Mix_GetError() << std::endl;
         return false;
     } 
 
-    gameOverSound = Mix_LoadWAV("game_over.wav");
+    gameOverSound = Mix_LoadWAV("assets/sound/game_over.wav");
     if (!gameOverSound) {
         std::cerr << "Failed to load game over sound! SDL_mixer Error: " << Mix_GetError() << std::endl;
         return false;

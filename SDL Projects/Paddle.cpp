@@ -6,7 +6,7 @@ Paddle::Paddle(SDL_Renderer* renderer) { // Tạo kích thước padfle
     movingLeft = false;
     movingRight = false;
     paddleTexture = nullptr;
-    SDL_Surface* loadedSurface = IMG_Load("paddle.png");
+    SDL_Surface* loadedSurface = IMG_Load("assets/image/paddle.png");
     if (!loadedSurface) {
         std::cerr << "Không tải được ảnh paddle! Lỗi: " << IMG_GetError() << std::endl;
     }
@@ -18,13 +18,13 @@ Paddle::Paddle(SDL_Renderer* renderer) { // Tạo kích thước padfle
 Paddle::~Paddle() {
     if (paddleTexture != nullptr) {
         SDL_DestroyTexture(paddleTexture);
-        paddleTexture = nullptr;
+        paddleTexture = nullptr; // dat con tro ve null sau khi destroy tẽture
     }
 }
 
 // Xử lý phím di chuyển paddle
 void Paddle::handleEvent(SDL_Event& e) {
-    if (e.type == SDL_KEYDOWN) {
+    if (e.type == SDL_KEYDOWN) { // nếu có phím nhấn xuống
         switch (e.key.keysym.sym) {
         case SDLK_LEFT:
             movingLeft = true;
@@ -34,7 +34,7 @@ void Paddle::handleEvent(SDL_Event& e) {
             break;
         }
     }
-    else if (e.type == SDL_KEYUP) {
+    else if (e.type == SDL_KEYUP) { // nếu có phím thả ra
         switch (e.key.keysym.sym) {
         case SDLK_LEFT:
             movingLeft = false;
@@ -49,10 +49,10 @@ void Paddle::handleEvent(SDL_Event& e) {
 
 void Paddle::update() {
     if (movingLeft) {
-        paddleRect.x -= speed;
+        paddleRect.x -= speed;//khi di sang trai thi vi tri tru di gia tri speed
     }
     if (movingRight) {
-        paddleRect.x += speed;
+        paddleRect.x += speed;//khi di sang phai thi vi tri tru di gia tri speed
     }
 
 
@@ -63,10 +63,10 @@ void Paddle::update() {
 // Vẽ paddle
 void Paddle::render(SDL_Renderer* renderer) {
     if (paddleTexture) {
-        SDL_RenderCopy(renderer, paddleTexture, nullptr, &paddleRect);
+        SDL_RenderCopy(renderer, paddleTexture, nullptr, &paddleRect); //nullptr dung de truyen tat ca texture chu ko cat 1 ti nao
     }
     else {
-        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255); // neu ko load dcd texture thi load mau trang(cai nay de debug thoi)
         SDL_RenderFillRect(renderer, &paddleRect);
     }
 }

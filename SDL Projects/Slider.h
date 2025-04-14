@@ -14,8 +14,8 @@ public:
 private:
     int x, y, width;
     int minValue, maxValue, currentValue;
-    bool isDragging;
-    SDL_Rect trackRect, knobRect;
+    bool isDragging; // kiem tra xem co dang keo knob ko 
+    SDL_Rect trackRect, knobRect; // thanh truot va nut truot
     SDL_Renderer* renderer; // Thêm thành viên renderer
 };
 
