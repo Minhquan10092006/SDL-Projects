@@ -10,9 +10,11 @@ public:
     Paddle(SDL_Renderer* renderer);
     ~Paddle();
     SDL_Rect&  getRect() { return paddleRect; }
+    void reset();
     void handleEvent(SDL_Event& e);
     void update();
     void render(SDL_Renderer* renderer);
+
 
 private:
     SDL_Rect paddleRect;

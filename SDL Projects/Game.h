@@ -5,6 +5,7 @@
 #include <SDL_ttf.h>
 #include <SDL_image.h>
 #include <vector>
+#include <fstream>
 #include <string>
 #include <SDL_mixer.h>
 #include "Ball.h"
@@ -27,6 +28,9 @@ public:
     void render();
     void close();
     void createBricks();
+    bool runMenu();
+    bool isRunningGame() const { return isRunning; }
+    void resetGame();
 
 private:
     SDL_Window* window;
@@ -46,13 +50,17 @@ private:
     Gamemode gamemode;
     int timeLeft;
     int lives;
-    float SpeedMultipiar;
+    int highScoreSurvival; // Điểm cao nhất cho chế độ SURVIVAL
+    int highScoreTimeAttack; // Điểm cao nhất cho chế độ TIME_ATTACK
 
     Menu* menu;
     Uint32 startTime;
 
     void renderTime();
     void timeUp();
+    void loadHighScores();
+    void saveHighScores();
+
     bool isPaused = false;
     SDL_Texture* pauseBackground = nullptr;
     SDL_Texture* gameBackground = nullptr;
@@ -65,6 +73,7 @@ private:
     Mix_Chunk* gameOverSound = nullptr;
     Slider* volumeSlider;
     int volume;
+    bool returnToMenu = false;
 };
 
 #endif

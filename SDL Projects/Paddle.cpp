@@ -70,3 +70,9 @@ void Paddle::render(SDL_Renderer* renderer) {
         SDL_RenderFillRect(renderer, &paddleRect);
     }
 }
+void Paddle::reset() {
+    paddleRect.x = 350; // Center horizontally
+    paddleRect.y = 550; // Near bottom of the screen
+    movingLeft = false;
+    movingRight = false;
+}
