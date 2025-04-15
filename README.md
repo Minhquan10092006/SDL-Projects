@@ -104,13 +104,13 @@ Dưới đây là cấu trúc thư mục và mô tả các thành phần chính:
   Một vài đoạn logic tham khảo từ [Lazy Foo' SDL Tutorials](https://lazyfoo.net/tutorials/SDL/)
 
 - **Tài nguyên đồ họa:**  
-  - Paddle, bóng và gạch từ: [OpenGameArt - Breakout Brick Breaker Tileset](https://opengameart.org/content/breakout-brick-breaker-tile-set-free)
-  - Background từ: [Ocean and Clouds Free Pixel Art Backgrounds](https://craftpix.net/freebies/ocean-and-clouds-free-pixel-art-backgrounds/)
+  - Paddle, bóng và gạch từ [OpenGameArt - Breakout Brick Breaker Tileset](https://opengameart.org/content/breakout-brick-breaker-tile-set-free)
+  - Background từ [Ocean and Clouds Free Pixel Art Backgrounds](https://craftpix.net/freebies/ocean-and-clouds-free-pixel-art-backgrounds/)
 
 - **Âm thanh:**  
   - Hiệu ứng âm thanh từ [Mixkit Game Sound Effects](https://mixkit.co/free-sound-effects/game/)
-  - Hiệu ứng âm thanh game over[Super Mario gameover](https://www.youtube.com/shorts/3kvVMn28Ogg?feature=share)
-  - Hiệu ứng âm thanh background [𝐁𝐮𝐧𝐧𝐲 𝐆𝐢𝐫𝐥 𝐒𝐞𝐧𝐩𝐚𝐢 ~ lofi hiphop and lofi remix](https://youtu.be/g7Luv9ibHWg)
+  - Hiệu ứng âm thanh game over từ [Super Mario gameover](https://www.youtube.com/shorts/3kvVMn28Ogg?feature=share)
+  - Hiệu ứng âm thanh background từ [𝐁𝐮𝐧𝐧𝐲 𝐆𝐢𝐫𝐥 𝐒𝐞𝐧𝐩𝐚𝐢 ~ lofi hiphop and lofi remix](https://youtu.be/g7Luv9ibHWg)
 ---
 
 ## Video giới thiệu
