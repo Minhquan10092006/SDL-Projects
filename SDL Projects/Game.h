@@ -14,7 +14,7 @@
 #include "Menu.h"
 #include "Slider.h"
 
-enum Gamemode {SURVIVAL, TIME_ATTACK};
+enum Gamemode { SURVIVAL, TIME_ATTACK };
 
 class Game {
 public:
@@ -39,19 +39,19 @@ private:
 
     Ball* ball;
     Paddle* paddle;
-    std::vector<Brick> bricks; // khai báo vactor brick (làm vector cho dễ chỉnh sửa)
+    std::vector<Brick> bricks;
     int score;
     TTF_Font* font;
 
     void increaseScore(int amount);
     void renderScore();
     void gameOver();
-    
+
     Gamemode gamemode;
     int timeLeft;
     int lives;
-    int highScoreSurvival; // Điểm cao nhất cho chế độ SURVIVAL
-    int highScoreTimeAttack; // Điểm cao nhất cho chế độ TIME_ATTACK
+    int highScoreSurvival;
+    int highScoreTimeAttack;
 
     Menu* menu;
     Uint32 startTime;
@@ -63,16 +63,17 @@ private:
     void saveHighScores();
     bool isWin = false;
     void gameWin();
-
+    bool isGameOver = false;
+    bool isPlayingMusic = false;
     bool isPaused = false;
     SDL_Texture* pauseBackground = nullptr;
     SDL_Texture* gameBackground = nullptr;
     SDL_Texture* loadTexture(const std::string& path);
     SDL_Texture* brickTexture = nullptr;
-    
-    Mix_Music* backgroundMusic = nullptr; // nhac nen
-    Mix_Chunk* brickHitSound = nullptr;   // am thanh khi dap vao brick
-    Mix_Chunk* paddleHitSound = nullptr; // am thanh khi dap vao paddle
+
+    Mix_Music* backgroundMusic = nullptr;
+    Mix_Chunk* brickHitSound = nullptr;
+    Mix_Chunk* paddleHitSound = nullptr;
     Mix_Chunk* gameOverSound = nullptr;
     Slider* volumeSlider;
     int volume;

@@ -2,7 +2,7 @@
 
 Brick::Brick(int x, int y, int width, int height, int strength) {
     brickRect = { x, y, width, height };
-    this->strength = strength; // luu cap cua gach
+    this->strength = strength;
     isDestroyed = false;
 }
 
@@ -10,19 +10,20 @@ Brick::~Brick() {}
 
 void Brick::render(SDL_Renderer* renderer) {
     if (strength == 1) {
-         SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255); // Yellow
+        SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255);
     }
     else if (strength == 2) {
-       SDL_SetRenderDrawColor(renderer, 255, 165, 0, 255); // Orange
+        SDL_SetRenderDrawColor(renderer, 255, 165, 0, 255);
     }
     else if (strength == 3) {
-        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255); // Red
+        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
     }
     SDL_RenderFillRect(renderer, &brickRect);
 }
+
 void Brick::hit() {
     if (strength > 0) {
-        strength--; // khi gahc bi đap thi suc manh giam di 1 va tu doi mau 
+        strength--;
         if (strength <= 0) {
             isDestroyed = true;
         }
@@ -30,5 +31,5 @@ void Brick::hit() {
 }
 
 bool Brick::checkCollision(SDL_Rect ballRect) {
-    return SDL_HasIntersection(&brickRect, &ballRect); // kiem tra va cham giua gach va bong
-} 
+    return SDL_HasIntersection(&brickRect, &ballRect);
+}

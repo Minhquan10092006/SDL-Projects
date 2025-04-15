@@ -2,7 +2,7 @@
 #include <iostream>
 
 
-Game::  Game() : window(nullptr), renderer(nullptr), isRunning(true), ball(nullptr), paddle(nullptr), lives(3), volume(64), returnToMenu(false){}
+Game::Game() : window(nullptr), renderer(nullptr), isRunning(true), ball(nullptr), paddle(nullptr), lives(3), volume(64), returnToMenu(false) {}
 
 Game::~Game() {
     close();
@@ -15,17 +15,17 @@ void Game::createBricks() {
 
     for (int row = 0; row < rows; row++) {
         for (int col = 0; col < cols; col++) {
-            int x = 60 + col * (brickWidth + 5);// +5 để làm cách viên gạch cách đều nhau ko bị dính thành hàng
-            int y = 35 + row * (brickHeight + 5);// +5 để làm gahcj k bị dính thành cột
+            int x = 60 + col * (brickWidth + 5);
+            int y = 35 + row * (brickHeight + 5);
             int strength;
             if (row < 2) {
-                strength = 3; // Red bricks
+                strength = 3;
             }
             else if (row < 4) {
-                strength = 2; // Orange bricks
+                strength = 2;
             }
             else {
-                strength = 1; // Yellow bricks
+                strength = 1;
             }
             bricks.emplace_back(x, y, brickWidth, brickHeight, strength);
         }
@@ -33,25 +33,24 @@ void Game::createBricks() {
 }
 
 void Game::resetGame() {
-    // Xóa tất cả các viên gạch
+    if (!isPlayingMusic) {
+        Mix_PlayMusic(backgroundMusic, -1);
+        isPlayingMusic = true;
+    }
     bricks.clear();
-
-    // Reset điểm số, số mạng và thời gian
     score = 0;
     lives = 3;
-    timeLeft = 120; // Chỉ áp dụng nếu ở chế độ Time Attack
-    startTime = SDL_GetTicks(); // Lưu thời gian bắt đầu
-
-    // Tạo lại các viên gạch
+    timeLeft = 120;
+    startTime = SDL_GetTicks();
     createBricks();
-
-    // Reset bóng và paddle
     if (ball) {
         ball->reset();
     }
     if (paddle) {
         paddle->reset();
     }
+    isGameOver = false;
+    isWin = false;
 }
 
 SDL_Texture* Game::loadTexture(const std::string& path) {
@@ -74,8 +73,8 @@ void Game::loadHighScores() {
         file.close();
     }
     else {
-        highScoreSurvival = 0; // Điểm mặc định cho SURVIVAL
-        highScoreTimeAttack = 0; // Điểm mặc định cho TIME_ATTACK
+        highScoreSurvival = 0;
+        highScoreTimeAttack = 0;
     }
 }
 
@@ -89,15 +88,14 @@ void Game::saveHighScores() {
 
 void Game::gameWin() {
     if (score > highScoreTimeAttack) {
-        highScoreTimeAttack = score; // Cập nhật điểm cao nhất
-        saveHighScores();            // Lưu điểm cao mới
+        highScoreTimeAttack = score;
+        saveHighScores();
     }
 
-    SDL_Color textColor = { 0, 255, 0 };  // Màu xanh lá (chiến thắng)
+    SDL_Color textColor = { 0, 255, 0 };
     SDL_Surface* surface = TTF_RenderText_Solid(font, "You Win! Press R to Restart, Q to Quit, or M to Menu", textColor);
     SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
 
-    // Hiển thị điểm số
     std::string scoreText = "Final Score: " + std::to_string(score);
     SDL_Surface* scoreSurface = TTF_RenderText_Solid(font, scoreText.c_str(), textColor);
     SDL_Texture* scoreTexture = SDL_CreateTextureFromSurface(renderer, scoreSurface);
@@ -106,9 +104,9 @@ void Game::gameWin() {
     SDL_Surface* highScoreSurface = TTF_RenderText_Solid(font, highScoreText.c_str(), textColor);
     SDL_Texture* highScoreTexture = SDL_CreateTextureFromSurface(renderer, highScoreSurface);
 
-    SDL_Rect textRect = { 150, 250, 500, 50 };  // Text "You Win"
-    SDL_Rect scoreRect = { 250, 320, 300, 50 }; // Final Score
-    SDL_Rect highScoreRect = { 250, 390, 300, 50 }; // High Score
+    SDL_Rect textRect = { 150, 250, 500, 50 };
+    SDL_Rect scoreRect = { 250, 320, 300, 50 };
+    SDL_Rect highScoreRect = { 250, 390, 300, 50 };
 
     SDL_FreeSurface(surface);
     SDL_FreeSurface(scoreSurface);
@@ -124,7 +122,7 @@ void Game::gameWin() {
             }
             if (event.type == SDL_KEYDOWN) {
                 if (event.key.keysym.sym == SDLK_r) {
-                    resetGame(); // Reset trạng thái game
+                    resetGame();
                     waiting = false;
                 }
                 if (event.key.keysym.sym == SDLK_q) {
@@ -132,7 +130,7 @@ void Game::gameWin() {
                     waiting = false;
                 }
                 if (event.key.keysym.sym == SDLK_m) {
-                    returnToMenu = true;  // Quay lại menu
+                    returnToMenu = true;
                     resetGame();
                     waiting = false;
                 }
@@ -156,6 +154,10 @@ void Game::gameWin() {
 bool Game::runMenu() {
     bool inMenu = true;
 
+    if (!isPlayingMusic && backgroundMusic) {
+        Mix_PlayMusic(backgroundMusic, -1);
+        isPlayingMusic = true;
+    }
     while (inMenu) {
         SDL_Event event;
         while (SDL_PollEvent(&event)) {
@@ -166,37 +168,48 @@ bool Game::runMenu() {
             if (menu->handleEvent(event)) {
                 int option = menu->getSelectedOption();
                 if (option == 0) {
-                    resetGame();
                     gamemode = SURVIVAL;
+                    resetGame();
                 }
                 else if (option == 1) {
-                    resetGame();
                     gamemode = TIME_ATTACK;
                     timeLeft = 120;
                     startTime = SDL_GetTicks();
+                    resetGame();
                 }
                 else if (option == 2) {
                     isRunning = false;
                     return false;
                 }
-                inMenu = false; // Thoát menu
+                inMenu = false;
             }
+
         }
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_RenderClear(renderer);
         menu->render();
+        SDL_RenderPresent(renderer);
     }
-    return true; // Menu xử lý xong, tiếp tục chơi
+    return true;
 }
 
 void Game::timeUp() {
     if (score > highScoreTimeAttack) {
         highScoreTimeAttack = score;
-        saveHighScores(); // Lưu điểm cao mới cho chế độ TIME_ATTACK
+        saveHighScores();
     }
-    SDL_Color textColor = { 255, 255, 0 };  // Màu vàng
+    if (!isGameOver) {
+        isGameOver = true;
+        if (Mix_PlayingMusic()) {
+            Mix_HaltMusic();
+        }
+        isPlayingMusic = false;
+        Mix_PlayChannel(-1, gameOverSound, 0);
+    }
+    SDL_Color textColor = { 255, 255, 0 };
     SDL_Surface* surface = TTF_RenderText_Solid(font, "Time is Up! Press R to Restart, Q to Quit, or M to Menu", textColor);
     SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
 
-    //Hiển thị điểm số
     std::string scoreText = "Final Score: " + std::to_string(score);
     SDL_Surface* scoreSurface = TTF_RenderText_Solid(font, scoreText.c_str(), textColor);
     SDL_Texture* scoreTexture = SDL_CreateTextureFromSurface(renderer, scoreSurface);
@@ -205,8 +218,8 @@ void Game::timeUp() {
     SDL_Surface* highScoreSurface = TTF_RenderText_Solid(font, highScoreText.c_str(), textColor);
     SDL_Texture* highScoreTexture = SDL_CreateTextureFromSurface(renderer, highScoreSurface);
 
-    SDL_Rect textRect = { 150, 250, 500, 50 };  // Time is Up text
-    SDL_Rect scoreRect = { 250, 320, 300, 50 }; // Điểm số
+    SDL_Rect textRect = { 150, 250, 500, 50 };
+    SDL_Rect scoreRect = { 250, 320, 300, 50 };
     SDL_Rect highScoreRect = { 250, 390, 300, 50 };
 
     SDL_FreeSurface(surface);
@@ -231,7 +244,7 @@ void Game::timeUp() {
                     waiting = false;
                 }
                 if (event.key.keysym.sym == SDLK_m) {
-                    returnToMenu = true;  // Đặt cờ để quay lại menu
+                    returnToMenu = true;
                     resetGame();
                     waiting = false;
                 }
@@ -241,7 +254,7 @@ void Game::timeUp() {
         SDL_RenderClear(renderer);
         SDL_RenderCopy(renderer, gameBackground, nullptr, nullptr);
         SDL_RenderCopy(renderer, texture, nullptr, &textRect);
-        SDL_RenderCopy(renderer, scoreTexture, nullptr, &scoreRect);  //Render điểm số
+        SDL_RenderCopy(renderer, scoreTexture, nullptr, &scoreRect);
         SDL_RenderCopy(renderer, highScoreTexture, nullptr, &highScoreRect);
         SDL_RenderPresent(renderer);
     }
@@ -252,13 +265,13 @@ void Game::timeUp() {
 
 void Game::renderTime() {
     if (gamemode == TIME_ATTACK) {
-        SDL_Color textColor = { 255, 255, 0 };  // Màu vàng
+        SDL_Color textColor = { 255, 255, 0 };
         std::string timeText = "Time: " + std::to_string(timeLeft);
 
         SDL_Surface* timeSurface = TTF_RenderText_Solid(font, timeText.c_str(), textColor);
         SDL_Texture* timeTexture = SDL_CreateTextureFromSurface(renderer, timeSurface);
 
-        SDL_Rect timeRect = { 450, 10, 100, 30 }; // Góc trên bên phải
+        SDL_Rect timeRect = { 450, 10, 100, 30 };
 
         SDL_FreeSurface(timeSurface);
         SDL_RenderCopy(renderer, timeTexture, nullptr, &timeRect);
@@ -275,16 +288,23 @@ void Game::gameOver() {
         highScoreTimeAttack = score;
         saveHighScores();
     }
-    Mix_PlayChannel(-1, gameOverSound, 0);
+    if (!isGameOver) {
+        isGameOver = true;
+
+        if (Mix_PlayingMusic()) {
+            Mix_HaltMusic();
+        }
+        isPlayingMusic = false;
+        Mix_PlayChannel(-1, gameOverSound, 0);
+    }
     SDL_Color textColor = { 255, 255, 255 };
     SDL_Surface* surface = TTF_RenderText_Solid(font, "Game Over! Press R to Restart, Q to Quit, or M to Menu", textColor);
     SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
 
-    //Hiển thị điểm số
     std::string scoreText = "Final Score: " + std::to_string(score);
     SDL_Surface* scoreSurface = TTF_RenderText_Solid(font, scoreText.c_str(), textColor);
     SDL_Texture* scoreTexture = SDL_CreateTextureFromSurface(renderer, scoreSurface);
-    
+
     std::string highScoreText;
     if (gamemode == SURVIVAL) {
         highScoreText = "High Score (Survival): " + std::to_string(highScoreSurvival);
@@ -295,8 +315,8 @@ void Game::gameOver() {
     SDL_Surface* highScoreSurface = TTF_RenderText_Solid(font, highScoreText.c_str(), textColor);
     SDL_Texture* highScoreTexture = SDL_CreateTextureFromSurface(renderer, highScoreSurface);
 
-    SDL_Rect textRect = { 150, 250, 500, 50 };  // Game Over text
-    SDL_Rect scoreRect = { 250, 320, 300, 50 }; // Điểm số
+    SDL_Rect textRect = { 150, 250, 500, 50 };
+    SDL_Rect scoreRect = { 250, 320, 300, 50 };
     SDL_Rect highScoreRect = { 250, 390, 300, 50 };
 
     SDL_FreeSurface(surface);
@@ -313,7 +333,7 @@ void Game::gameOver() {
             }
             if (event.type == SDL_KEYDOWN) {
                 if (event.key.keysym.sym == SDLK_r) {
-                    resetGame(); // Gọi hàm resetGame để reset trạng thái
+                    resetGame();
                     waiting = false;
                 }
                 if (event.key.keysym.sym == SDLK_q) {
@@ -321,7 +341,7 @@ void Game::gameOver() {
                     waiting = false;
                 }
                 if (event.key.keysym.sym == SDLK_m) {
-                    returnToMenu = true;  // Đặt cờ để quay lại menu
+                    returnToMenu = true;
                     resetGame();
                     waiting = false;
                 }
@@ -331,7 +351,7 @@ void Game::gameOver() {
         SDL_RenderClear(renderer);
         SDL_RenderCopy(renderer, gameBackground, nullptr, nullptr);
         SDL_RenderCopy(renderer, texture, nullptr, &textRect);
-        SDL_RenderCopy(renderer, scoreTexture, nullptr, &scoreRect);  //Render điểm số
+        SDL_RenderCopy(renderer, scoreTexture, nullptr, &scoreRect);
         SDL_RenderCopy(renderer, highScoreTexture, nullptr, &highScoreRect);
         SDL_RenderPresent(renderer);
     }
@@ -339,8 +359,6 @@ void Game::gameOver() {
     SDL_DestroyTexture(scoreTexture);
     SDL_DestroyTexture(highScoreTexture);
 }
-
-
 
 void Game::increaseScore(int amount) {
     score += amount;
@@ -352,7 +370,7 @@ void Game::renderScore() {
     static int lastLives = -1;
     static SDL_Texture* livesTexture = nullptr;
 
-    if (score != lastScore) {  // chỉ cập nhật lại texture khi điểm số thay đổi
+    if (score != lastScore) {
         lastScore = score;
 
         if (scoreTexture) SDL_DestroyTexture(scoreTexture);
@@ -414,7 +432,7 @@ bool Game::init() {
     if (!gameBackground) {
         std::cerr << "Không thể load ảnh nền game chính!" << std::endl;
     }
-    
+
     pauseBackground = loadTexture("assets/image/pause_background.png");
     if (!pauseBackground) {
         std::cerr << "Không thể load ảnh nền Pause!" << std::endl;
@@ -435,9 +453,8 @@ bool Game::init() {
         std::cerr << "Failed to load background music! SDL_mixer Error: " << Mix_GetError() << std::endl;
         return false;
     }
-    Mix_PlayMusic(backgroundMusic, -1); 
+    Mix_PlayMusic(backgroundMusic, -1);
 
-    // Tải âm thanh hiệu ứng
     brickHitSound = Mix_LoadWAV("assets/sound/brick_hit.wav");
     if (!brickHitSound) {
         std::cerr << "Failed to load brick hit sound! SDL_mixer Error: " << Mix_GetError() << std::endl;
@@ -448,7 +465,7 @@ bool Game::init() {
     if (!paddleHitSound) {
         std::cerr << "Failed to load paddle hit sound! SDL_mixer Error: " << Mix_GetError() << std::endl;
         return false;
-    } 
+    }
 
     gameOverSound = Mix_LoadWAV("assets/sound/game_over.wav");
     if (!gameOverSound) {
@@ -458,12 +475,11 @@ bool Game::init() {
 
     loadHighScores();
 
-    volumeSlider = new Slider(300, 300, 200, 0, 128, volume, renderer); // Thanh trượt nằm giữa màn hình
+    volumeSlider = new Slider(300, 300, 200, 0, 128, volume, renderer);
 
     if (!runMenu()) {
-        return false; // Nếu người dùng thoát ở menu, không khởi chạy trò chơi
+        return false;
     }
-
 
     ball = new Ball(400, 300, 20, 5.0f, -5.0f, renderer);
     paddle = new Paddle(renderer);
@@ -472,8 +488,8 @@ bool Game::init() {
 }
 
 void Game::run() {
-    const int FPS = 60;  // giới hạn khung hình thành 60fps 
-    const int frameDelay = 1000 / FPS; // dùng để xác định frame per second
+    const int FPS = 60;
+    const int frameDelay = 1000 / FPS;
 
     Uint32 frameStart;
     int frameTime;
@@ -481,7 +497,6 @@ void Game::run() {
 
     while (isRunning && !returnToMenu) {
         frameStart = SDL_GetTicks();
-        // xử lý sự kiện
         SDL_Event event;
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT) {
@@ -489,12 +504,11 @@ void Game::run() {
             }
             if (event.type == SDL_KEYDOWN) {
                 if (event.key.keysym.sym == SDLK_ESCAPE) {
-                    isPaused = !isPaused;  // Đảo trạng thái Pause
+                    isPaused = !isPaused;
                     if (isPaused) {
-                        pausedTime = SDL_GetTicks(); // Lưu thời gian khi bị paused
+                        pausedTime = SDL_GetTicks();
                     }
                     else {
-                        // Cập nhật startTime để bù thời gian bị paused
                         startTime += SDL_GetTicks() - pausedTime;
                     }
                 }
@@ -502,69 +516,57 @@ void Game::run() {
             if (isPaused) {
                 if (event.type == SDL_KEYDOWN) {
                     if (event.key.keysym.sym == SDLK_m) {
-                        returnToMenu = true; // Đặt cờ để quay lại menu
-                        isPaused = false;    // Tắt chế độ PAUSED
+                        returnToMenu = true;
+                        isPaused = false;
                     }
                 }
-                volumeSlider->handleEvent(event);  // Kéo thanh trượt
+                volumeSlider->handleEvent(event);
             }
             if (!isPaused) {
                 paddle->handleEvent(event);
             }
         }
         if (isPaused) {
-    SDL_Color textColor = { 0, 0, 0 };
-
-    // Vẽ background Pause
-    SDL_RenderCopy(renderer, pauseBackground, nullptr, nullptr);
-
-    // Cập nhật âm lượng dựa trên giá trị của thanh trượt
-    int volume = volumeSlider->getValue();
-    volumeSlider->render(renderer);
-
-    Mix_Volume(-1, volume);       // Cập nhật âm lượng cho hiệu ứng âm thanh
-    Mix_VolumeMusic(volume);      // Cập nhật âm lượng cho nhạc nền
-
-    // Vẽ chữ "Paused - Press ESC to Resume"
-    SDL_Surface* pauseSurface = TTF_RenderText_Solid(font, "Paused - Press ESC to Resume, M to Menu", textColor);
-    SDL_Texture* pauseTexture = SDL_CreateTextureFromSurface(renderer, pauseSurface);
-    SDL_Rect pauseRect = { 200, 250, 400, 50 };
-    SDL_RenderCopy(renderer, pauseTexture, nullptr, &pauseRect);
-    SDL_FreeSurface(pauseSurface);
-    SDL_DestroyTexture(pauseTexture);
-
-    // 🔊 Vẽ chữ "Volume: x"
-    std::string volumeText = "Volume: " + std::to_string(volume);
-    SDL_Surface* volumeSurface = TTF_RenderText_Solid(font, volumeText.c_str(), textColor);
-    SDL_Texture* volumeTexture = SDL_CreateTextureFromSurface(renderer, volumeSurface);
-    SDL_Rect volumeRect = { 300, 270 + 60, 200, 30 };  // Gần bên dưới thanh trượt (giả định y = 330)
-    SDL_RenderCopy(renderer, volumeTexture, nullptr, &volumeRect);
-    SDL_FreeSurface(volumeSurface);
-    SDL_DestroyTexture(volumeTexture);
-
-    SDL_RenderPresent(renderer);
-    continue;  // Không update game khi pause
-}
-
-    //Thêm Time Attack
-    if (gamemode == TIME_ATTACK && !isPaused) {
-        Uint32 currentTime = SDL_GetTicks();
-        timeLeft = 120 - (currentTime - startTime) / 1000;
-        if (timeLeft <= 0) {
-            timeUp();
-            return;  // Kết thúc game ngay khi hết thời gian
+            SDL_Color textColor = { 0, 0, 0 };
+            SDL_RenderCopy(renderer, pauseBackground, nullptr, nullptr);
+            int volume = volumeSlider->getValue();
+            volumeSlider->render(renderer);
+            Mix_Volume(-1, volume);
+            Mix_VolumeMusic(volume);
+            SDL_Surface* pauseSurface = TTF_RenderText_Solid(font, "Paused - Press ESC to Resume, M to Menu", textColor);
+            SDL_Texture* pauseTexture = SDL_CreateTextureFromSurface(renderer, pauseSurface);
+            SDL_Rect pauseRect = { 200, 250, 400, 50 };
+            SDL_RenderCopy(renderer, pauseTexture, nullptr, &pauseRect);
+            SDL_FreeSurface(pauseSurface);
+            SDL_DestroyTexture(pauseTexture);
+            std::string volumeText = "Volume: " + std::to_string(volume);
+            SDL_Surface* volumeSurface = TTF_RenderText_Solid(font, volumeText.c_str(), textColor);
+            SDL_Texture* volumeTexture = SDL_CreateTextureFromSurface(renderer, volumeSurface);
+            SDL_Rect volumeRect = { 300, 270 + 60, 200, 30 };
+            SDL_RenderCopy(renderer, volumeTexture, nullptr, &volumeRect);
+            SDL_FreeSurface(volumeSurface);
+            SDL_DestroyTexture(volumeTexture);
+            SDL_RenderPresent(renderer);
+            continue;
         }
-        if (lives <= 0) {
-            gameOver();
-            return;
-        }
-        if (isWin) {
-            gameWin(); // Hiển thị màn hình chiến thắng
-            return;    // Thoát vòng lặp game
-        }
-    }
 
-        // Cập nhật trạng thái game
+        if (gamemode == TIME_ATTACK && !isPaused) {
+            Uint32 currentTime = SDL_GetTicks();
+            timeLeft = 120 - (currentTime - startTime) / 1000;
+            if (timeLeft <= 0) {
+                timeUp();
+                return;
+            }
+            if (lives <= 0) {
+                gameOver();
+                return;
+            }
+            if (isWin) {
+                gameWin();
+                return;
+            }
+        }
+
         ball->update(bricks);
         paddle->update();
 
@@ -593,7 +595,7 @@ void Game::run() {
 
         if (ball->ballLost) {
             lives--;
-            ball->ballLost = false; // Reset cờ
+            ball->ballLost = false;
             if (lives <= 0) {
                 gameOver();
                 if (!isRunning) {
@@ -601,17 +603,16 @@ void Game::run() {
                 }
             }
             else {
-                ball->reset();  // Reset bóng nếu vẫn còn mạng
+                ball->reset();
             }
         }
 
         if (bricks.empty()) {
             if (gamemode == TIME_ATTACK) {
-                isWin = true; // Đặt trạng thái thắng
-                break;        // Thoát vòng lặp game để hiển thị màn hình chiến thắng
+                isWin = true;
+                break;
             }
             else {
-                // Nếu không phải Time Attack, tiếp tục tạo lại gạch
                 ball->speedX *= 1.1f;
                 ball->speedY *= 1.1f;
                 createBricks();
@@ -628,8 +629,8 @@ void Game::run() {
             brick.render(renderer);
         }
 
-        renderScore();  // Hiển thị điểm số 
-        if (gamemode == TIME_ATTACK) renderTime();  // Hiển thị thời gian nếu ở chế độ Time Attack
+        renderScore();
+        if (gamemode == TIME_ATTACK) renderTime();
 
         SDL_RenderPresent(renderer);
         frameTime = SDL_GetTicks() - frameStart;
@@ -639,7 +640,7 @@ void Game::run() {
         }
     }
 }
-    
+
 
 void Game::close() {
     if (ball) {
@@ -654,13 +655,13 @@ void Game::close() {
     if (pauseBackground) {
         SDL_DestroyTexture(pauseBackground);
         pauseBackground = nullptr;
-    }   
+    }
 
     if (gameBackground) {
         SDL_DestroyTexture(gameBackground);
         gameBackground = nullptr;
     }
-   
+
     if (brickTexture) {
         SDL_DestroyTexture(brickTexture);
         brickTexture = nullptr;

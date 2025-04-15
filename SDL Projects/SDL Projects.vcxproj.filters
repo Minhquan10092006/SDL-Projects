@@ -44,9 +44,6 @@
     <ClInclude Include="Paddle.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="Ball.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="Brick.h">
       <Filter>Source Files</Filter>
     </ClInclude>
@@ -55,6 +52,9 @@
     </ClInclude>
     <ClInclude Include="Slider.h">
       <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Ball.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

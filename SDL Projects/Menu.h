@@ -10,21 +10,20 @@
 struct Button {
 	SDL_Rect rect;
 	std::string text;
-	SDL_Color normalColor; 
-	SDL_Color hoverColor; // màu khi trỏ chuột lên
-	bool isHovered; // biến kiểm tra xem chuột có đang chỉ vào rect ko
-
+	SDL_Color normalColor;
+	SDL_Color hoverColor;
+	bool isHovered;
 };
 
 class Menu {
 public:
 	Menu(SDL_Renderer* renderer);
-	~Menu(); // destructor giải phóng tài nguyên
+	~Menu();
 
 	bool handleEvent(SDL_Event& e);
 	void render();
-	
-	int getSelectedOption(); // lấy lựa chọn hiện tại
+
+	int getSelectedOption();
 	bool loadBackground(const std::string& filePath);
 
 private:
@@ -35,4 +34,3 @@ private:
 	int selectedOption;
 };
 #endif // !MENU_H
-

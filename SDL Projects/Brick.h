@@ -9,7 +9,7 @@ class Brick {
 public:
     SDL_Rect brickRect;
     bool isDestroyed;
-    int strength; // bien luu suc manh cua gach (3 cap tu 1 den 3)
+    int strength; 
 
     Brick(int x, int y, int width, int height, int strength );
     ~Brick();
