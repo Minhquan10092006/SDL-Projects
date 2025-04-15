@@ -143,7 +143,7 @@ Nếu bạn có ý tưởng hoặc phát hiện lỗi, vui lòng tạo issue ho�
    Game có thể thêm hiệu ứng hình ảnh đặc biệt, mở rộng chế độ chơi hoặc tăng độ khó để thử thách lâu dài hơn.
 
 5. **Tính đa dạng và sự thử thách (8/10)**:  
-   Các chế độ chơi giữ thử thách, nhưng có thể dễ dàng hơn với game thủ lâu dài nếu không có sự thay đổi gameplay.
+   Các chế độ chơi giữ thử thách, nhưng có thể dễ dàng chiến thắng hơn với game thủ lâu dài nếu không có sự thay đổi gameplay.
 
 
 ## Giấy phép
