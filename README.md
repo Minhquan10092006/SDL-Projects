@@ -125,7 +125,7 @@ Nếu bạn có ý tưởng hoặc phát hiện lỗi, vui lòng tạo issue ho�
 ---
 
 ## 🧠 Mức độ sử dụng AI
-AI được sử dụng chủ yếu để tra cứu và học về các hàm của SDL2, vẽ background của GameOver và được sử dụng để hỗ trợ Debug khi không còn cách nào khác.
+AI được sử dụng chủ yếu để tra cứu và học về các hàm của SDL2, tham khảo làm thanh trượt và được sử dụng để hỗ trợ Debug khi không còn cách nào khác.
 
 ---
 
