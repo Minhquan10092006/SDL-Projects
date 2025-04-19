@@ -37,7 +37,7 @@ Dưới đây là cấu trúc thư mục và mô tả các thành phần chính:
   Bóng sẽ nảy qua lại khi va vào paddle hoặc gạch. Cảm giác nghe tiếng “bộp” khi trúng gạch nó đã tai lắm 😆
 
 - **💯 Phá gạch ghi điểm:**  
-  Gạch nào bị đập là cộng điểm. Càng phá được nhiều thì điểm càng cao, nhìn cũng sướng mắt nữa.
+  Gạch nào bị đập là cộng 10 điểm. Càng phá được nhiều thì điểm càng cao, nhìn cũng sướng mắt nữa. Có 3 màu gạch vàng, cam và đỏ với sức mạnh tăng dần
 
 - **🎶 Âm thanh & giao diện:**  
   Có nhạc nền nghe chill khi chơi, kèm theo hiệu ứng âm thanh mỗi lần bóng va chạm. Game over hay hết giờ cũng có nhạc riêng. Giao diện thì đơn giản, dễ nhìn, tập trung vào gameplay.
@@ -106,6 +106,7 @@ Dưới đây là cấu trúc thư mục và mô tả các thành phần chính:
 - **🎨 Tài nguyên đồ họa:**  
   - Paddle, bóng và gạch từ [OpenGameArt - Breakout Brick Breaker Tileset](https://opengameart.org/content/breakout-brick-breaker-tile-set-free)
   - Background từ [Ocean and Clouds Free Pixel Art Backgrounds](https://craftpix.net/freebies/ocean-and-clouds-free-pixel-art-backgrounds/)
+  - Font chữ từ [Font Space- Feulisma font](https://www.fontspace.com/feulismia-font-f139028) và [Font space - Meloncamp](https://www.fontspace.com/melon-camp-font-f139888)
 
 - **🔊 Âm thanh:**  
   - Hiệu ứng âm thanh từ [Mixkit Game Sound Effects](https://mixkit.co/free-sound-effects/game/)
@@ -114,7 +115,7 @@ Dưới đây là cấu trúc thư mục và mô tả các thành phần chính:
 ---
 
 ## 🎥 Video giới thiệu
-Video giới thiệu cấu trúc mã nguồn và cách chơi: [Link đến video YouTube hoặc Google Drive](#)
+Video giới thiệu game và chạy thử: [Demo game Brick Breaker - First big project](https://youtu.be/tXE1JXwJdwc)
 
 ---
 
