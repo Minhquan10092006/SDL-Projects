@@ -115,7 +115,7 @@ Dưới đây là cấu trúc thư mục và mô tả các thành phần chính:
 ---
 
 ## 🎥 Video giới thiệu
-Video giới thiệu game và chạy thử: [Demo game Brick Breaker - First big project](https://youtu.be/tXE1JXwJdwc)
+Video giới thiệu game và chạy thử: [Demo game Brick Breaker - First big project](https://youtu.be/ik9KapIMlsE)
 
 ---
 
