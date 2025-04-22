@@ -139,7 +139,7 @@ AI được sử dụng chủ yếu để tra cứu và học về các hàm c�
 - **Cách cài đặt**: Khi mọi người tải về xong, giải nén ra và chạy file .exe, thế là xong rồi 👌👌👌
 
 ---
-## 🎯 Ngưỡng điểm mong muốn 8 - 8.5
+## 🎯 Ngưỡng điểm mong muốn 7.5 - 8
 - Lý do em muốn được ngưỡng điểm này là vì:
 1. **Gameplay hấp dẫn và quen thuộc (8/10)**:  
    Game arcade dễ tiếp cận, các chế độ **Survival** và **Time Attack** tạo thử thách mới mẻ, không nhàm chán.
@@ -147,7 +147,7 @@ AI được sử dụng chủ yếu để tra cứu và học về các hàm c�
 2. **Đồ họa và âm thanh ổn (8/10)**:  
    Đồ họa đơn giản, dễ nhìn, âm thanh sinh động giúp tăng trải nghiệm, nhạc nền tạo không khí arcade vui nhộn.
 
-3. **Các tính năng và sự sáng tạo (8.5/10)**:  
+3. **Các tính năng và sự sáng tạo (7.5/10)**:  
    Các tính năng như **pause game**, **thanh trượt âm lượng**, **high score** riêng cho mỗi chế độ giúp người chơi dễ quản lý game.
 
 4. **Cải tiến có thể thêm một cách dễ dàng với code chia file logic (8/10)**:  
